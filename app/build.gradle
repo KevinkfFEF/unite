@@ -1,0 +1,47 @@
+apply plugin: 'com.android.library'
+apply plugin: 'org.greenrobot.greendao'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:design:26.0.0-beta1'
+    implementation 'org.greenrobot:greendao:3.2.2'
+    /*rx-android-java*/
+    implementation 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+    implementation 'com.trello:rxlifecycle:1.0'
+    implementation 'com.trello:rxlifecycle-components:1.0'
+    /*rotrofit*/
+    implementation 'com.squareup.retrofit2:retrofit:2.1.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.0.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.1.2'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+}
+
+
+//新添加
+//publish {
+//    userOrg = 'othershe' //在https://bintray.com上注册的用户名
+//    groupId = 'com.othershe' //jCenter上的路径
+//    artifactId = 'dutil' //要上传的library名称（和二、4中的package相同）
+//    publishVersion = '1.0.0' //library的版本号
+//    desc = 'A download library，that is based on okhttp' //library的简单描述
+//    website = 'https://github.com/Othershe/DUtil' //library的开源地址，例如在github上的地址
+//}
