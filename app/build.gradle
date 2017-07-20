@@ -1,7 +1,16 @@
 apply plugin: 'com.android.library'
 apply plugin: 'org.greenrobot.greendao'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+// 这个version是区分library版本的，因此当我们需要更新library时记得修改这个version
+// 这个version影响后面的引用
+version = "v0.0.1"
 
 android {
+
+    resourcePrefix "kf" //随意填写
+
     compileSdkVersion 26
     buildToolsVersion "26.0.0"
     defaultConfig {
@@ -17,15 +26,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-}
 
+    // 移除lint检查的error
+    lintOptions {
+        abortOnError false
+    }
+
+}
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:design:26.0.0-beta1'
     implementation 'org.greenrobot:greendao:3.2.2'
     /*rx-android-java*/
     implementation 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-    implementation 'com.trello:rxlifecycle:1.0'
+    implementation 'com.trello.rxlifecycle2:rxlifecycle:2.1.0'
     implementation 'com.trello:rxlifecycle-components:1.0'
     /*rotrofit*/
     implementation 'com.squareup.retrofit2:retrofit:2.1.0'
@@ -33,15 +50,79 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.1.2'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+
 }
 
+def siteUrl = 'https://github.com/KevinkfFEF/unite'   // 项目的主页
+def gitUrl = 'git@github.com:KevinkfFEF/unite.git'   // Git仓库的url
+group = "com.unite"            // Maven Group ID for the artifact，一般填你唯一的包名
 
-//新添加
-//publish {
-//    userOrg = 'othershe' //在https://bintray.com上注册的用户名
-//    groupId = 'com.othershe' //jCenter上的路径
-//    artifactId = 'dutil' //要上传的library名称（和二、4中的package相同）
-//    publishVersion = '1.0.0' //library的版本号
-//    desc = 'A download library，that is based on okhttp' //library的简单描述
-//    website = 'https://github.com/Othershe/DUtil' //library的开源地址，例如在github上的地址
-//}
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                // Add your description here
+                name 'Android unite'     //项目的描述 你可以多写一点
+                url siteUrl
+                // Set your license
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'fan'        //填写的一些基本信息
+                        name 'Kevinfff'
+                        email 'kangfanfff@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    options.encoding "UTF-8"
+    options.charSet 'UTF-8'
+    options.author true
+    options.version true
+    options.links "https://github.com/KevinkfFEF/unite/docs/javadoc"
+    failOnError false
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = "unite"    //发布到JCenter上的项目名字
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
+}
